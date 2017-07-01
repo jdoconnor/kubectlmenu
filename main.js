@@ -8,6 +8,7 @@ const url = require('url')
 const ipc = electron.ipcMain
 const Menu = electron.Menu
 const Tray = electron.Tray
+var { Kubectl } = require('./src/Kubectl');
 
 const getContextCmd = spawn("kubectl", ["config", "view", "-o", "json"]).on('error', function( err ){ throw err })
 
@@ -16,12 +17,12 @@ const getContextCmd = spawn("kubectl", ["config", "view", "-o", "json"]).on('err
 let appIcon
 
 async function createMenuBar () {
-  var kubecfg = await getKubeConfig();
+  var kubecfg = await Kubectl.getContexts();
   console.log(kubecfg)
   const iconName = 'menubar-icon.png'
   const iconPath = path.join(__dirname, iconName)
   appIcon = new Tray(iconPath)
-  menuTemplate<Hash> = []
+  menuTemplate = []
   for(context of kubecfg.contexts){
     menuTemplate.push({
       label: context.name,
@@ -41,14 +42,6 @@ async function createMenuBar () {
   contextMenu = Menu.buildFromTemplate(menuTemplate)
   
   appIcon.setContextMenu(contextMenu)
-}
-
-function getKubeConfig() {
-  return new Promise(resolve => {
-    getContextCmd.stdout.on('data', (data) => {
-      resolve(JSON.parse(data.toString()))
-    });
-  })
 }
 
 // This method will be called when Electron has finished
