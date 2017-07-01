@@ -1,0 +1,26 @@
+switch contexts
+exec to a container
+tail a container
+tail all containers of a type
+delete a pod
+
+switch context
+  - *context 1
+  - context 2
+
+namespaces
+  - namespace1
+    - container.name
+      - tail
+        - all
+        -
+        - pod1
+        - pod2
+      - exec
+        - any
+        -
+        - pod1
+        - pod2
+    - deployment2
+  - namespace2
+  
