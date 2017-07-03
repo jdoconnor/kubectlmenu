@@ -1,5 +1,7 @@
 const electron = require('electron')
 const { spawn } = require('child_process')
+const fs = require('fs');
+
 // Module to control application life.
 const app = electron.app
 
@@ -18,19 +20,50 @@ let appIcon
 
 async function createMenuBar () {
   var kubecfg = await Kubectl.getContexts();
+  var pods = await Kubectl.getPods();
+  // setBreakpoint()
   console.log(kubecfg)
   const iconName = 'menubar-icon.png'
   const iconPath = path.join(__dirname, iconName)
   appIcon = new Tray(iconPath)
   menuTemplate = []
+  
+  contextMenus = []
   for(context of kubecfg.contexts){
-    menuTemplate.push({
+    contextMenus.push({
       label: context.name,
       click: function() {
         app.quit()
       }
     })
   }
+  menuTemplate.push({
+    label: 'contexts',
+    submenu: contextMenus
+  })
+  
+  podMenus = []
+  for(pod of pods.items){
+    podMenus.push({
+      label: pod.metadata.name,
+      click: function() {
+        var executablePath = "/Applications/iTerm.app/Contents/MacOS/iTerm2";
+        var child = spawn(executablePath, [], {
+          detached: true,
+          stdio: 'ignore'
+        });
+
+        child.unref();
+      }
+    })
+  }
+  
+  menuTemplate.push({
+    label: 'apps',
+    submenu: podMenus
+  })
+  
+  
   // add the quit menuitem
   menuTemplate.push({
     label: 'Quit',
