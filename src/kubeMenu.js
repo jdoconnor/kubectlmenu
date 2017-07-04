@@ -58,16 +58,7 @@ class KubeMenu {
       label: 'apps',
       submenu: podMenus
     })
-    
-    
-    // add the quit menuitem
-    menuTemplate.push({
-      label: 'Quit',
-      click: function () {
-        app.quit()
-      }
-    })
-    
+        
     var contextMenu = Menu.buildFromTemplate(menuTemplate)
     return contextMenu
   }

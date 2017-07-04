@@ -9,6 +9,7 @@ const path = require('path')
 const url = require('url')
 const ipc = electron.ipcMain
 const Menu = electron.Menu
+const MenuItem = electron.MenuItem
 const Tray = electron.Tray
 const BrowserWindow = electron.BrowserWindow
 import {enableLiveReload} from 'electron-compile';
@@ -62,8 +63,15 @@ app.on('activate', function () {
 async function createMenuBar(){
   var { KubeMenu } = require('./src/kubeMenu');
   let contextMenu = await new KubeMenu().getMenuRoot()
-  console.log("foobar")
-  console.log(contextMenu)
+
+  // add the quit menuitem
+  var quit = new MenuItem({
+    label: 'Quit',
+    click: function () {
+      app.quit()
+    }
+  })
+  contextMenu.append(quit)
   let iconName = 'menubar-icon.png'
   let iconPath = path.join(__dirname, iconName)
   appIcon = new Tray(iconPath)
