@@ -1,29 +1,19 @@
-const electron = require('electron')
 const { spawn } = require('child_process')
-const fs = require('fs');
 var { Kubectl } = require('./kubectl');
 var { Terminal } = require('./terminal');
-const app = electron.app
-
-const path = require('path')
-const url = require('url')
-const ipc = electron.ipcMain
+const electron = require('electron')
 const Menu = electron.Menu
-const Tray = electron.Tray
 
 class KubeMenu {
-  async createMenuBar () {
+  async getMenuRoot () {
     var kubecfg = await Kubectl.getContexts();
     var pods = await Kubectl.getPods();
     
-    console.log(kubecfg)
-    const iconName = 'menubar-icon.png'
-    const iconPath = path.join(__dirname, iconName)
-    appIcon = new Tray(iconPath)
-    menuTemplate = []
+    // console.log(kubecfg)
+    var menuTemplate = []
     
-    contextMenus = []
-    for(context of kubecfg.contexts){
+    var contextMenus = []
+    for(var context of kubecfg.contexts){
       contextMenus.push({
         label: context.name,
         click: function() {
@@ -35,14 +25,14 @@ class KubeMenu {
       label: 'contexts',
       submenu: contextMenus
     })
-    podnames = pods.items.map(function(item){
+    var podnames = pods.items.map(function(item){
       item.spec.containers.map(function(container){
         container.name
       })
     })
     
-    podMenus = []
-    for(pod of pods.items){
+    var podMenus = []
+    for(var pod of pods.items){
       let runMenu = []
       runMenu.push({
         label: 'bash',
@@ -78,9 +68,8 @@ class KubeMenu {
       }
     })
     
-    contextMenu = Menu.buildFromTemplate(menuTemplate)
-    
-    appIcon.setContextMenu(contextMenu)
+    var contextMenu = Menu.buildFromTemplate(menuTemplate)
+    return contextMenu
   }
 
 }
