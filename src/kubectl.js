@@ -11,6 +11,15 @@ class Kubectl {
     })
   }
   
+  static changeContext(context){
+    return new Promise(resolve => {
+      let cmd = spawn("kubectl", ["config", "use-context", context]).on('error', function( err ){ throw err })
+      cmd.stdout.on('data', (data) => {
+        resolve(data)
+      });
+    })
+  }
+  
   static getNamespaces() {
     return new Promise(resolve => {
       let cmd = spawn("kubectl", ["get", "namespaces", "-o", "json"]).on('error', function( err ){ throw err })
@@ -35,12 +44,12 @@ class Kubectl {
       let fullData = ""
       cmd.stdout.on('data', (data) => {
         fullData = fullData.concat(data)
-        console.log(fullData)
+        // console.log(fullData)
         // console.log(data.toString())
       })
       cmd.stdout.on('close', (code) => {
-        console.log(code)
-        console.log(fullData)
+        // console.log(code)
+        // console.log(fullData)
         resolve(JSON.parse(fullData.toString()))
       })
     })
