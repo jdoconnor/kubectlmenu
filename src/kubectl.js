@@ -38,9 +38,9 @@ class Kubectl {
     })
   }
 
-  static getPods() {
+  static getPods(namespace) {
     return new Promise(resolve => {
-      let cmd = spawn("kubectl", ["get", "pods", "-o", "json"]).on('error', function( err ){ throw err })
+      let cmd = spawn("kubectl", [`--namespace=${namespace}`, "get", "pods", "-o", "json"]).on('error', function( err ){ throw err })
       let fullData = ""
       cmd.stdout.on('data', (data) => {
         fullData = fullData.concat(data)

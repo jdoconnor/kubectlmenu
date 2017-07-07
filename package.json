@@ -25,6 +25,7 @@
     "electron-rebuild": "^1.5.11"
   },
   "dependencies": {
-    "asar": "^0.13.0"
+    "asar": "^0.13.0",
+    "jsonpath": "^0.2.11"
   }
 }

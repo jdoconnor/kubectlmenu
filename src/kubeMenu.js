@@ -1,6 +1,6 @@
 const { spawn } = require('child_process')
-var { Kubectl } = require('./kubectl');
-var { Terminal } = require('./terminal');
+var { Kubectl } = require('./kubectl')
+var { Terminal } = require('./terminal')
 const electron = require('electron')
 const Menu = electron.Menu
 const MenuItem = electron.MenuItem
@@ -11,21 +11,13 @@ class KubeMenu {
   }
 
   async getMenuRoot () {
-    var kubeContexts = await Kubectl.getContexts();
-    var pods = await Kubectl.getPods();
     var rootMenu = new Menu()
     var contextMenu = new Menu()
-    var appMenu = new Menu()
-    rootMenu.append(new MenuItem({
-      label: 'contexts',
-      submenu: contextMenu
-    }))
+    var jp = require('jsonpath');
 
-    rootMenu.append(new MenuItem({
-      label: 'apps',
-      submenu: appMenu
-    }))
 
+    // contexts Menu
+    var kubeContexts = await Kubectl.getContexts()
     var currentContext = kubeContexts['current-context']
     for(var context of kubeContexts.contexts){
       let checked = (currentContext === context.name) ? true : false
@@ -41,39 +33,70 @@ class KubeMenu {
       }))
     }
 
-    var podnames = pods.items.map(function(item){
-      item.spec.containers.map(function(container){
-        container.name
-      })
-    })
+    // namespaces menu
+    var namespaces = await Kubectl.getNamespaces()
+    rootMenu.append(new MenuItem({
+      label: 'contexts',
+      submenu: contextMenu
+    }))
+    rootMenu.append(new MenuItem({
+      type: 'separator'
+    }))
 
-    var podMenus = []
-    for(var pod of pods.items){
-      let actionMenu = new Menu()
-      appMenu.append(new MenuItem({
-        label: pod.metadata.name,
-        submenu: actionMenu
+    for(var namespace of namespaces.items){
+      let containerMenu = new Menu()
+      rootMenu.append(new MenuItem({
+        label: namespace.metadata.name,
+        submenu: containerMenu
       }))
 
-      let podName = pod.metadata.name
-      let podNamespace = pod.metadata.namespace
+      let pods = await Kubectl.getPods(namespace.metadata.name)
+      let containerNames = jp.query(pods, "$.items[*].spec.containers[*].name")
+      containerNames = [...new Set(containerNames)]
 
-      actionMenu.append(new MenuItem({
-        label: 'bash',
-        click: function() {
-          Terminal.runExec(podName, podNamespace)
+      let containerMenus = []
+      for(var containerName of containerNames){
+        containerMenus[containerName] = new MenuItem({
+          label: containerName
+        })
+        containerMenu.append(containerMenus[containerName])
+      }
+
+      for(var pod of pods.items){
+        for(var container of pod.spec.containers) {
+          // put the pod listing under the container menu
+          let actionMenu = new Menu()
+          let containerName = container.name
+          console.log(containerName)
+          console.log(containerMenus[containerName])
+          containerMenus[containerName].append(new MenuItem({
+            label: pod.metadata.name,
+            submenu: actionMenu
+          }))
+
+          let podName = pod.metadata.name
+          let podNamespace = pod.metadata.namespace
+
+          actionMenu.append(new MenuItem({
+            label: 'bash',
+            click: function() {
+              Terminal.runExec(podName, containerName, podNamespace)
+            }
+          }))
+
+          actionMenu.append(new MenuItem({
+            label: 'tail',
+            click: function() {
+              Terminal.runTail(podName, containerName, podNamespace)
+            }
+          }))
         }
-      }))
-
-      actionMenu.append(new MenuItem({
-        label: 'tail',
-        click: function() {
-          Terminal.runTail(podName, podNamespace)
-        }
-      }))
-
+      }
     }
 
+    rootMenu.append(new MenuItem({
+      type: 'separator'
+    }))
     return rootMenu
   }
 
