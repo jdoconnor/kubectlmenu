@@ -62,7 +62,7 @@ app.on('activate', function () {
 
 async function createMenuBar(){
   var { KubeMenu } = require('./src/kubeMenu');
-  let rootMenu = await new KubeMenu().getMenuRoot()
+  let rootMenu = await new KubeMenu(app).getMenuRoot()
 
   // add the quit menuitem
   var quit = new MenuItem({
@@ -75,7 +75,6 @@ async function createMenuBar(){
   let iconName = 'menubar-icon.png'
   let iconPath = path.join(__dirname, iconName)
   appIcon = new Tray(iconPath)
-
   appIcon.setContextMenu(rootMenu)
 }
 
@@ -84,6 +83,10 @@ async function createMenuBar(){
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
 app.on('ready', createMenuBar)
+app.on('redraw-menu', (event) => {
+  appIcon.destroy()
+  createMenuBar()
+})
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
