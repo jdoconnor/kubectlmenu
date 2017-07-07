@@ -6,6 +6,10 @@ const Menu = electron.Menu
 const MenuItem = electron.MenuItem
 
 class KubeMenu {
+  constructor(app) {
+    this.app = app
+  }
+
   async getMenuRoot () {
     var kubeContexts = await Kubectl.getContexts();
     var pods = await Kubectl.getPods();
@@ -25,12 +29,14 @@ class KubeMenu {
     var currentContext = kubeContexts['current-context']
     for(var context of kubeContexts.contexts){
       let checked = (currentContext === context.name) ? true : false
+      let contextName = context.name
       contextMenu.append(new MenuItem({
         type: 'radio',
         checked: checked,
-        label: context.name,
-        click: function() {
-          app.quit()
+        label: contextName,
+        click: () => {
+          Kubectl.changeContext(contextName)
+          this.app.emit('redraw-menu')
         }
       }))
     }
