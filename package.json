@@ -23,5 +23,8 @@
     "electron": "1.7.3",
     "electron-prebuilt-compile": "^1.6.11",
     "electron-rebuild": "^1.5.11"
+  },
+  "dependencies": {
+    "asar": "^0.13.0"
   }
 }

@@ -62,7 +62,7 @@ app.on('activate', function () {
 
 async function createMenuBar(){
   var { KubeMenu } = require('./src/kubeMenu');
-  let contextMenu = await new KubeMenu().getMenuRoot()
+  let rootMenu = await new KubeMenu().getMenuRoot()
 
   // add the quit menuitem
   var quit = new MenuItem({
@@ -71,12 +71,12 @@ async function createMenuBar(){
       app.quit()
     }
   })
-  contextMenu.append(quit)
+  rootMenu.append(quit)
   let iconName = 'menubar-icon.png'
   let iconPath = path.join(__dirname, iconName)
   appIcon = new Tray(iconPath)
-  
-  appIcon.setContextMenu(contextMenu)
+
+  appIcon.setContextMenu(rootMenu)
 }
 
 // This method will be called when Electron has finished
