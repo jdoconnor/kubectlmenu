@@ -55,29 +55,37 @@ class KubeMenu {
   async createContainersTemplate(ns){
     var template = []
     var pods = await Kubectl.getPods(ns)
-    for(var pod of pods.items){
-      var containerNames = [...new Set(this.jp.query(pod, "$.spec.containers[*].name"))]
-      for(var container of containerNames){
-        template.push({ label: container, submenu: this.createActionTemplate(ns, pod.metadata.name, container) })
-      }
+    var containerNames = [...new Set(this.jp.query(pods, "$.items[*].spec.containers[*].name"))]
+    for(var container of containerNames){
+      template.push({
+        label: container,
+        submenu: this.createPodTemplate(pods, container)
+      })
     }
     return template
   }
 
-  createActionTemplate(ns, pod, container){
+  createPodTemplate(pods, container) {
     var template = []
-    template.push({
-      label: 'exec',
-      click: () => {
-        Terminal.runExec(pod, container, ns)
+    for(var pod of pods.items){
+      // if this pod is running this container, add an exec and tail to the menu
+      var containersInPod = this.jp.query(pod, "$.spec.containers[*].name")
+      if(containersInPod.includes(container)){
+        template.push({
+          label: 'exec',
+          click: () => {
+            Terminal.runExec(pod.metadata.name, container, pod.metadata.namespace)
+          }
+        })
+        template.push({
+          label: 'tail',
+          click: () => {
+            Terminal.runTail(pod.metadata.name, container, pod.metadata.namespace)
+          }
+        })
+        break
       }
-    })
-    template.push({
-      label: 'tail',
-      click: () => {
-        Terminal.runTail(pod, container, ns)
-      }
-    })
+    }
     return template
   }
 }
