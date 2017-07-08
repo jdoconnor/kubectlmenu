@@ -1,6 +1,6 @@
 const { spawn } = require('child_process')
-var { Kubectl } = require('./kubectl');
-var { Terminal } = require('./terminal');
+var { Kubectl } = require('./kubectl')
+var { Terminal } = require('./terminal')
 const electron = require('electron')
 const Menu = electron.Menu
 const MenuItem = electron.MenuItem
@@ -8,29 +8,29 @@ const MenuItem = electron.MenuItem
 class KubeMenu {
   constructor(app) {
     this.app = app
+    this.jp = require('jsonpath');
   }
 
   async getMenuRoot () {
-    var kubeContexts = await Kubectl.getContexts();
-    var pods = await Kubectl.getPods();
     var rootMenu = new Menu()
     var contextMenu = new Menu()
-    var appMenu = new Menu()
-    rootMenu.append(new MenuItem({
-      label: 'contexts',
-      submenu: contextMenu
-    }))
 
-    rootMenu.append(new MenuItem({
-      label: 'apps',
-      submenu: appMenu
-    }))
+    var rootMenu = [
+      { label: 'contexts', submenu: await this.createContextTemplate() },
+      { type:  'separator' },
+      { label: 'namespaces', submenu: await this.createNamespacesTemplate()}
+    ]
+    return Menu.buildFromTemplate(rootMenu)
+  }
 
+  async createContextTemplate(){
+    var template = []
+    var kubeContexts = await Kubectl.getContexts()
     var currentContext = kubeContexts['current-context']
     for(var context of kubeContexts.contexts){
       let checked = (currentContext === context.name) ? true : false
       let contextName = context.name
-      contextMenu.append(new MenuItem({
+      template.push({
         type: 'radio',
         checked: checked,
         label: contextName,
@@ -38,45 +38,48 @@ class KubeMenu {
           Kubectl.changeContext(contextName)
           this.app.emit('redraw-menu')
         }
-      }))
-    }
-
-    var podnames = pods.items.map(function(item){
-      item.spec.containers.map(function(container){
-        container.name
       })
-    })
-
-    var podMenus = []
-    for(var pod of pods.items){
-      let actionMenu = new Menu()
-      appMenu.append(new MenuItem({
-        label: pod.metadata.name,
-        submenu: actionMenu
-      }))
-
-      let podName = pod.metadata.name
-      let podNamespace = pod.metadata.namespace
-
-      actionMenu.append(new MenuItem({
-        label: 'bash',
-        click: function() {
-          Terminal.runExec(podName, podNamespace)
-        }
-      }))
-
-      actionMenu.append(new MenuItem({
-        label: 'tail',
-        click: function() {
-          Terminal.runTail(podName, podNamespace)
-        }
-      }))
-
     }
-
-    return rootMenu
+    return template
   }
 
+  async createNamespacesTemplate(){
+    var template = []
+    var namespaces = await Kubectl.getNamespaces()
+    for(var ns of this.jp.query(namespaces, "$.items[*].metadata.name")){
+      template.push({ label: ns, submenu: await this.createContainersTemplate(ns) })
+    }
+    return template
+  }
+
+  async createContainersTemplate(ns){
+    var template = []
+    var pods = await Kubectl.getPods(ns)
+    for(var pod of pods.items){
+      var containerNames = [...new Set(this.jp.query(pod, "$.spec.containers[*].name"))]
+      for(var container of containerNames){
+        template.push({ label: container, submenu: this.createActionTemplate(ns, pod.metadata.name, container) })
+      }
+    }
+    return template
+  }
+
+  createActionTemplate(ns, pod, container){
+    var template = []
+    template.push({
+      label: 'exec',
+      click: () => {
+        Terminal.runExec(pod, container, ns)
+      }
+    })
+    template.push({
+      label: 'tail',
+      click: () => {
+        Terminal.runTail(pod, container, ns)
+      }
+    })
+    return template
+  }
 }
 
 exports.KubeMenu = KubeMenu;
