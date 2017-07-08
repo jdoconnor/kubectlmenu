@@ -2,6 +2,7 @@ const { spawn } = require('child_process')
 
 class Terminal {
   static runCommand(command){
+    console.log(command)
     let child = spawn(
       "osascript",
       ["-e", `tell application "Terminal" to do script "${command}"`],
