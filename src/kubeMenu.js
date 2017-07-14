@@ -4,6 +4,7 @@ var { Terminal } = require('./terminal')
 const electron = require('electron')
 const Menu = electron.Menu
 const MenuItem = electron.MenuItem
+var log = require('electron-log')
 
 class KubeMenu {
   constructor(app) {
@@ -14,7 +15,6 @@ class KubeMenu {
   async getMenuRoot () {
     var rootMenu = new Menu()
     var contextMenu = new Menu()
-
     var rootMenu = [
       { label: 'contexts', submenu: await this.createContextTemplate() },
       { type:  'separator' },
@@ -40,6 +40,7 @@ class KubeMenu {
         }
       })
     }
+
     return template
   }
 
