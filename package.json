@@ -1,31 +1,36 @@
 {
-  "name": "electron-quick-start",
-  "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "name": "kubectlctl",
+  "version": "0.0.2",
+  "description": "Kubectl in a menubar",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "debug": "electron --inspect=5858 .",
-    "debugbrk": "electron --inspect-brk=5858 ."
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
+  "build": {
+    "appId": "com.lumoslabs.kubectlctl",
+    "mac": {
+      "category": "utility"
+    },
+    "asar": false,
+    "files": [
+      "**/*"
+    ]
+  },
+  "repository": "https://github.com/lumoslabs/kubectlctl",
+  "keywords": [],
+  "author": "Jay OConnor",
   "license": "CC0-1.0",
   "devDependencies": {
     "devtron": "^1.4.0",
     "electron": "1.7.3",
-    "electron-prebuilt-compile": "^1.6.11",
-    "electron-rebuild": "^1.5.11"
+    "electron-builder": "^19.13.0",
+    "electron-prebuilt-compile": "^1.7.3"
   },
   "dependencies": {
     "asar": "^0.13.0",
+    "electron-log": "^2.2.7",
     "jsonpath": "^0.2.11"
   }
 }
