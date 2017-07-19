@@ -1,5 +1,5 @@
 {
-  "name": "kubectlctl",
+  "name": "kubectlmenu",
   "version": "0.0.2",
   "description": "Kubectl in a menubar",
   "main": "main.js",
@@ -9,7 +9,7 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "com.lumoslabs.kubectlctl",
+    "appId": "com.lumoslabs.kubectlmenu",
     "mac": {
       "category": "utility"
     },
@@ -18,7 +18,7 @@
       "**/*"
     ]
   },
-  "repository": "https://github.com/lumoslabs/kubectlctl",
+  "repository": "https://github.com/lumoslabs/kubectlmenu",
   "keywords": [],
   "author": "Jay OConnor",
   "license": "CC0-1.0",
