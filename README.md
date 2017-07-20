@@ -3,7 +3,11 @@ Electron App that works with the Mac menu bar to give quick access to kubectl co
 
 ![](screenshot.png)
 
-### How to run this thing
+### How to Install
+
+Check out the Github releases tab above. Download and open the .dmg file and drag/drop kubectlmenu.app into your Applications folder.
+
+### How to Develop
 
 First, install dependencies:
 
