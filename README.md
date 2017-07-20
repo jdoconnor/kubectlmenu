@@ -20,3 +20,7 @@ Next, run with Electron:
 ```
 electron .
 ```
+
+### How to Release
+
+Run `node_modules/.bin/electron-builder build` to build the MacOS .dmg file.

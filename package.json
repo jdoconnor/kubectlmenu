@@ -1,6 +1,6 @@
 {
   "name": "kubectlmenu",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Kubectl in a menubar",
   "main": "main.js",
   "scripts": {
