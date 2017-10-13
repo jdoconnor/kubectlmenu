@@ -17,7 +17,7 @@ var log = require('electron-log')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let appIcon
+let appTray
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -67,8 +67,8 @@ async function createMenuBar(){
     OJoAAAAASUVORK5CYII=`)
   // let iconName = `${app.getAppPath()}/menubar-icon.png`
   // let iconPath = path.join(__dirname, iconName)
-  appIcon = new Tray(icon)
-  appIcon.setContextMenu(rootMenu)
+  appTray = new Tray(icon)
+  appTray.setContextMenu(rootMenu)
 }
 
 // This method will be called when Electron has finished
@@ -76,8 +76,15 @@ async function createMenuBar(){
 // Some APIs can only be used after this event occurs.
 app.on('ready', createMenuBar)
 app.on('redraw-menu', (event) => {
-  appIcon.destroy()
+  appTray.destroy()
   createMenuBar()
+})
+
+app.on('show-progress-menu', (event) => {
+  console.log("in show progress menu")
+  // show a loading icon
+  let icon = nativeImage.createFromDataURL(`data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAABCJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iCiAgICAgICAgICAgIHhtbG5zOmV4aWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vZXhpZi8xLjAvIgogICAgICAgICAgICB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iCiAgICAgICAgICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyI+CiAgICAgICAgIDx0aWZmOlJlc29sdXRpb25Vbml0PjI8L3RpZmY6UmVzb2x1dGlvblVuaXQ+CiAgICAgICAgIDx0aWZmOkNvbXByZXNzaW9uPjU8L3RpZmY6Q29tcHJlc3Npb24+CiAgICAgICAgIDx0aWZmOlhSZXNvbHV0aW9uPjcyPC90aWZmOlhSZXNvbHV0aW9uPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICAgICA8dGlmZjpZUmVzb2x1dGlvbj43MjwvdGlmZjpZUmVzb2x1dGlvbj4KICAgICAgICAgPGV4aWY6UGl4ZWxYRGltZW5zaW9uPjE2PC9leGlmOlBpeGVsWERpbWVuc2lvbj4KICAgICAgICAgPGV4aWY6Q29sb3JTcGFjZT4xPC9leGlmOkNvbG9yU3BhY2U+CiAgICAgICAgIDxleGlmOlBpeGVsWURpbWVuc2lvbj4xNjwvZXhpZjpQaXhlbFlEaW1lbnNpb24+CiAgICAgICAgIDxkYzpzdWJqZWN0PgogICAgICAgICAgICA8cmRmOkJhZy8+CiAgICAgICAgIDwvZGM6c3ViamVjdD4KICAgICAgICAgPHhtcDpNb2RpZnlEYXRlPjIwMTctMTAtMTNUMTI6MTA6NjU8L3htcDpNb2RpZnlEYXRlPgogICAgICAgICA8eG1wOkNyZWF0b3JUb29sPlBpeGVsbWF0b3IgMy43PC94bXA6Q3JlYXRvclRvb2w+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgpx458ZAAADHklEQVQ4EXVSW0gUURj+zszs7OzsbrurrZUZVmiaFa2lRRbShSSDjG4kFUU9SHR5CIIieqq3XoKgiIJuL5EUQVEvQhczu0mlXVwvm1rpqrnbrrqzOzs7czozUA9WP8zA+f/v+/4r8B97Pkhzkho9ndDoiVffafZ/YH+7H/fQqYpGj6pfmjvH7x2jiQcnqdrX0j6epkcaw9Q/kUF+O1pZxiI/9pC+5jr9072C8eAjZLSMFbaJdjhL1kKYV9ORzi27HPyB62W5ZMQMWgJDKTrbF/10X2+5VjIWfAJNTYLqGqTClQA1kOpuBOFtECUnXEyIX7TrY0Qq3jDNR3o5U8UJbCAf6kuiHxqgCzKT5SAVrYFcugVyYDOkgkorV4YTEX13H3h7Y77LgSqTK5g/hx5fqAy0g3dNZqRt4N1TAF5gOjZQVqS8kIkUr4WhxKC8q4c6GIRDHQmYXO5cF7Xrsa8BNTYAPfYdxvgIHPOroXY/gzbUAS38GWrvK1bJJuijYYbpRzo+BP1nT2ldC7UJlV7kp/tDBZoSZ/XYIeYFEL15AK4VdRCy8lk7BNpwF6K3DkFeUAPl/R2kk6PM1z1nZ055njBdRjEXDbkNXQfn9LIvC+KMADjZB7XvDYggQvDmQcxdAM7lB2d3wUjGQSOhrDnzGNcnYYc+3AmO9e1cVAvO4QXvmQal9S4b5GrYZy2zsvK+PCbqYa1sZdgc8PFeTJWxWFB0NIiFq7bT0EuMPb+E9EAbHHOrWCY3Ei+ugtgcIJKbVWLH2NPzSHU9AcfaIjN3a6Mq3nKTbLgiBGovZC/ZDhga1J5mJvIRrop9IA4PCCvZXXkI6f5WiwxDh7d0I8Tyvac8EnnIdkXoyyA9XrHi8FzPj9CqWGcTm/A3jDVeZBP/Zg3R3E4m0geaUeEtWArb8oP1p4M4Y67xzymH4rRwZqqzIXZrf75GRFA2KD0RMTHWQHlnNmxGEq5NZ1vbpEB1mZ+EzdgfAfMRTtBq/2DT7XjTJdkwKGNah2qdM8+QzvKdkeHp69bP8JDXJv6fFk/RdQalw3SCMcHeiEIrJpJ+AbL5XZBdjHF2AAAAAElFTkSuQmCC`)
+  appTray.setImage(icon)
 })
 
 // In this file you can include the rest of your app's specific main process
