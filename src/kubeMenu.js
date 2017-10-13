@@ -35,6 +35,7 @@ class KubeMenu {
         checked: checked,
         label: contextName,
         click: () => {
+          this.app.emit('show-progress-menu')
           Kubectl.changeContext(contextName)
           this.app.emit('redraw-menu')
         }
