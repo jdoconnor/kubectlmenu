@@ -1,15 +1,9 @@
 const { spawn } = require('child_process')
+var terminalTab = require('terminal-tab')
 
 class Terminal {
   static runCommand(command){
-    let child = spawn(
-      "osascript",
-      ["-e", `tell application "Terminal" to do script "${command}"`],
-      {
-        detached: true,
-        stdio: 'ignore'
-      }
-    )
+    terminalTab.open(`${command}`)
   }
 
   static runExec(podName, containerName, namespace){
