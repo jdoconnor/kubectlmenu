@@ -1,0 +1,17 @@
+name: kubectlmenu
+version: 0.1.0
+
+authors:
+  - Jay OConnor <jay@jayoconnor.com>
+
+targets:
+  kubectlmenu:
+    main: src/kubectlmenu.cr
+
+dependencies:
+  pyrite:
+    github: psykube/pyrite
+
+crystal: 0.26.1
+
+license: MIT
