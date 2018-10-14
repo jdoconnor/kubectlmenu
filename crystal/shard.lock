@@ -1,0 +1,6 @@
+version: 1.0
+shards:
+  pyrite:
+    github: psykube/pyrite
+    commit: 270584bf9bb1c1ed7ff29b7607cfdde4c5b611cd
+
