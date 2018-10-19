@@ -4,7 +4,7 @@ require "pyrite/versions/v1.10"
 module Kubectlmenu
   VERSION = "0.1.0"
 
-  string = `kubectl get pods --all-namespaces -o=json`
+  string = `/usr/local/bin/kubectl get pods --all-namespaces -o=json`
   namespaces = {} of String => Array(Pyrite::Api::Core::V1::Pod)
   Pyrite::Api::Core::V1::List.from_json(string).items.not_nil!.select do |pod|
     if pod.is_a?(Pyrite::Api::Core::V1::Pod)
